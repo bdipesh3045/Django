@@ -1,6 +1,6 @@
 from rest_framework import viewsets
 from django.core.exceptions import ObjectDoesNotExist
-from .serializers import UserSerializer, UserSerializer1, LoginSerializer
+from .serializers import UserSerializer, UserSerializer1, LoginSerializer, Otpserializer
 from rest_framework.response import Response
 from rest_framework import status
 from .emails import send_otp
@@ -11,22 +11,41 @@ from django.shortcuts import redirect
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import get_user_model
-from django.urls import reverse_lazy
-from django.contrib.auth import authenticate
+from django.urls import reverse
+
+from django.contrib.auth import authenticate, login
 
 Users = get_user_model()
 
 
 class otpview(APIView):
-    authentication_classes = []
+    # authentication_classes = []
     permission_classes = [IsAuthenticated]
 
-    def dispatch(self, request, *args, **kwargs):
+    def check(self, request):
         if not request.user.is_authenticated:
-            return redirect(
-                reverse_lazy("login")
-            )  # Replace '/login/' with your actual login URL
-        return super().dispatch(request, *args, **kwargs)
+            return redirect(reverse("login"))
+
+    def get(self, request):
+        self.check(request)
+        return Response("Verify the user")
+
+    def post(self, request):
+        self.check(request)
+        user = request.user
+        set_otp = user.otp
+        otp = Otpserializer(data=request.data)
+        otp.is_valid(raise_exception=True)
+        if set_otp == otp.validated_data["otp"]:
+            user.is_otp_verified
+            return Response({"detail": "Otp verified"}, status=200)
+        else:
+            return Response({"detail": "Otp invalid"}, status=400)
+
+    # def dispatch(self, request, *args, **kwargs):
+    #     print(request.user.is_authenticated)
+    #     if not request.user.is_authenticated:
+    #         return redirect(reverse("login"))
 
 
 class LoginView(APIView):
@@ -45,15 +64,18 @@ class LoginView(APIView):
         if password_matches == False:
             return Response({"detail": "Password is incorrect"}, status=400)
 
-        authenticated_user = authenticate(request=request,email=email, password=password)
+        authenticated_user = authenticate(
+            request=request, email=email, password=password
+        )
+
         if authenticated_user is None:
             return Response({"detail": "Authentication failed"}, status=400)
-        request.user.is_authenticated = True
-        print(request.user.is_authenticated)
-        if user.is_active:
+        login(request, authenticated_user)
+
+        if user.is_otp_verified:
             return Response({"detail": "Login successful"}, status=200)
         else:
-            return Response("Verify the user!")
+            return redirect(reverse("otp"))
 
 
 class UsersViewset(viewsets.ModelViewSet):

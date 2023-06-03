@@ -26,6 +26,7 @@ class UsersManager(BaseUserManager):
         other_fields.setdefault("is_staff", True)
         other_fields.setdefault("is_superuser", True)
         other_fields.setdefault("is_active", True)
+        other_fields.setdefault("is_otp_verified", True)
 
         user = self.create_user(
             email=email,
@@ -49,8 +50,9 @@ class Users(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(primary_key=True)
     profile_picture = models.ImageField(null=True, upload_to="photos", blank=True)
     is_staff = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=False)
-    is_superuser = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    is_superuser = models.BooleanField(default=True)
+    is_otp_verified = models.BooleanField(default=False)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username"]

@@ -5,6 +5,11 @@ import bleach
 
 # class UserVerify(serializers.ModelSerializer):
 #     class meta
+class Otpserializer(serializers.Serializer):
+    otp = serializers.IntegerField(max_value=9999, min_value=0000)
+
+    class Meta:
+        fields = ["otp"]
 
 
 class LoginSerializer(serializers.Serializer):
