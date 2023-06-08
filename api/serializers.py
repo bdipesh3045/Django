@@ -102,3 +102,47 @@ class UserSerializer1(serializers.ModelSerializer):
         return attrs
 
     # Image validation remaining
+
+
+# Serializers to show full blog data
+# class Blogserializers(serializers.ModelField):
+#     class Meta:
+#         model = Blogs
+#         fields = ["date", "blog_title", "blog_content", "staff_member"]
+
+
+class UserBlog(serializers.ModelSerializer):
+    class Meta:
+        model = Users
+        exclude = [
+            "email",
+            "is_staff",
+            "is_active",
+            "is_superuser",
+            "is_otp_verified",
+            "groups",
+            "user_permissions",
+            "password",
+            "last_login",
+            "otp",
+        ]
+
+
+class BlogSerialize_wa(serializers.ModelSerializer):
+    email = serializers.EmailField(source="staff_member")
+    # data = serializers.SerializerMethodField()
+    data = UserBlog(source="staff_member")
+
+    # active = serializers.BooleanField(source="is_active")
+    class Meta:
+        model = Blogs
+
+        fields = ["date", "data", "blog_title", "blog_content", "email"]
+
+    # def get_data(self, blogs):
+    #     user_data = Users.objects.filter(email=blogs.staff_member)
+    #     print(user_data)
+    #     # Custom logic to retrieve the latest blog for the user
+    #     # latest_blog = Blogs.objects.filter(staff_member_id=user.email)
+    #     user = UserBlog(user_data)
+    #     return user.data

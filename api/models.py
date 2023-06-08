@@ -60,7 +60,10 @@ class Users(AbstractBaseUser, PermissionsMixin):
     objects = UsersManager()
 
     def __str__(self) -> str:
-        return f"{self.name}{self.email}"
+        return f"{self.email}"
+
+
+from django.contrib.auth import get_user_model
 
 
 class Blogs(models.Model):
@@ -68,7 +71,7 @@ class Blogs(models.Model):
     blog_title = models.CharField(max_length=20, primary_key=True)
     blog_content = models.CharField(max_length=10000)
     staff_member = models.ForeignKey(
-        settings.AUTH_USER_MODEL, related_name="Blogs", on_delete=models.CASCADE
+        get_user_model(), related_name="Blogs", on_delete=models.CASCADE
     )
 
     def __str__(self):
