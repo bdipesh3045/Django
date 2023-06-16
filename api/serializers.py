@@ -131,13 +131,51 @@ class UserBlog(serializers.ModelSerializer):
 class BlogSerialize_wa(serializers.ModelSerializer):
     email = serializers.EmailField(source="staff_member")
     # data = serializers.SerializerMethodField()
-    data = UserBlog(source="staff_member")
+    # data = UserBlog(source="staff_member")
+    name = serializers.SerializerMethodField()
+    username = serializers.SerializerMethodField()
+    profile_picture = serializers.SerializerMethodField()
 
     # active = serializers.BooleanField(source="is_active")
     class Meta:
         model = Blogs
 
-        fields = ["date", "data", "blog_title", "blog_content", "email"]
+        fields = [
+            # "data",
+            "email",
+            "name",
+            "username",
+            "profile_picture",
+            "date",
+            "blog_title",
+            "blog_content",
+        ]
+        filterset_fields = ["date"]
+
+    def get_username(self, obj):
+        return obj.staff_member.username
+
+        # data = obj["data"]
+        # return data["username"]
+
+    def get_name(self, obj):
+        return obj.staff_member.name
+
+    # return obj.data.name
+    # data = obj["data"]
+    # return data["name"]
+
+    def get_profile_picture(self, obj):
+        return (
+            obj.staff_member.profile_picture.url
+            if obj.staff_member.profile_picture
+            else None
+        )
+        # return obj.staff_member.profile_picture
+
+    # data = obj["data"]
+    # return obj.data.profile_picture
+    # return data["profile_picture"]
 
     # def get_data(self, blogs):
     #     user_data = Users.objects.filter(email=blogs.staff_member)

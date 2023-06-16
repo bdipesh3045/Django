@@ -38,8 +38,15 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "django_filters",
     "api",
 ]
+
+
+REST_FRAMEWORK = {
+    "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"]
+}
+
 AUTH_USER_MODEL = "api.Users"
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

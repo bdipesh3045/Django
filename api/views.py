@@ -166,26 +166,39 @@ class BlogPagination(PageNumberPagination):
 
 
 # ALL blog By email
+# from .filters import BlogFilter
+
+# from django_filters import rest_framework as filters
+# from rest_framework.filters import DjangoFilterBackend
+
+# from django_filters.rest_framework import DjangoFilterBackend
 
 
-class BlogView(APIView):
-    pagination_class = BlogPagination
+# class BlogView(APIView):
+#     pagination_class = BlogPagination
+#     filter_backends = [DjangoFilterBackend]
+#     # filterset_fields = ("date", "email", "name", "username")
+#     filterset_class = BlogFilter
 
-    def get(self, request):
-        paginator = self.pagination_class()
+#     def get(self, request):
+#         paginator = self.pagination_class()
 
-        blogs_query = Blogs.objects.all()
-        paginated_blogs = paginator.paginate_queryset(blogs_query, request)
-        blog_serializer = BlogSerialize_wa(paginated_blogs, many=True)
-        # blog_serializer = BlogSerializer(blogs_query, many=True)
-        # return Response(blog_serializer.data)
-        return paginator.get_paginated_response(blog_serializer.data)
+#         blogs_query = Blogs.objects.all()
+#         filtered_blogs = self.filterset_class(request.GET, queryset=blogs_query).qs
+#         paginated_blogs = paginator.paginate_queryset(filtered_blogs, request)
+#         blog_serializer = BlogSerialize_wa(paginated_blogs, many=True)
+#         # blog_serializer = BlogSerializer(blogs_query, many=True)
+#         # return Response(blog_serializer.data)
+#         return paginator.get_paginated_response(blog_serializer.data)
 
 
 class UsersViewset(viewsets.ModelViewSet):
     queryset = Users.objects.all()
     serializer_class = UserSerializer
     pagination_class = BlogPagination
+
+
+# from django_filters.rest_framework import DjangoFilterBackend
 
 
 class TestViewset1(APIView):
@@ -217,3 +230,29 @@ class TestViewset1(APIView):
 #         blog_serializer = BlogSerializer(blogs_query, many=True)
 #         return Response(blog_serializer.data)
 #         # return paginator.get_paginated_response(blog_serializer.data)
+import django_filters.rest_framework
+
+
+class BlogFilter(django_filters.FilterSet):
+    name = django_filters.CharFilter(lookup_expr="icontains")
+    username = django_filters.CharFilter(lookup_expr="icontains")
+    date = django_filters.DateFilter()
+    email = django_filters.CharFilter(lookup_expr="icontains")
+
+    class Meta:
+        model = Blogs
+        fields = ["name", "username", "date", "email"]
+
+
+class BlogView(APIView):
+    pagination_class = BlogPagination
+    filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
+    filterset_class = BlogFilter
+
+    def get(self, request):
+        paginator = self.pagination_class()
+
+        blogs_query = Blogs.objects.all()
+        paginated_blogs = paginator.paginate_queryset(blogs_query, request)
+        blog_serializer = BlogSerialize_wa(paginated_blogs, many=True)
+        return paginator.get_paginated_response(blog_serializer.data)
