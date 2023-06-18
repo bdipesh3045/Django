@@ -5,7 +5,7 @@ from rest_framework.routers import DefaultRouter
 router = DefaultRouter()
 
 router.register("test", views.UsersViewset, basename="test")
-router.register("users", views.UserCreateView, basename="create_user")
+router.register("crerate", views.UserCreateView, basename="create_user")
 
 
 urlpatterns = [
