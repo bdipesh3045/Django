@@ -4,8 +4,9 @@ from rest_framework.permissions import IsAuthenticated
 from api.views import BlogPagination
 from django.contrib.auth import get_user_model
 from .serializers import UserBlog
-
-Users = get_user_model()
+from api.serializers import User_detail
+from rest_framework.response import Response
+from rest_framework import status
 
 
 class UserBlogs(APIView):
@@ -20,3 +21,20 @@ class UserBlogs(APIView):
         paginated_blogs = paginator.paginate_queryset(blog, request)
         SerializedData = UserBlog(paginated_blogs, many=True)
         return paginator.get_paginated_response(SerializedData.data)
+
+
+class Users(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        email = request.user.email
+
+        Users = get_user_model()
+        user_details = Users.objects.filter(pk=email)
+
+        data = User_detail(user_details, many=True)
+
+        return Response(data={"Details": data.data}, status=status.HTTP_200_OK)
+
+
+# class BlogCrud(APIView):

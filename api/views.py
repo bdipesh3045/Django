@@ -108,11 +108,12 @@ class sendotpagain(APIView):
 
 # Logout view
 class LogoutView(APIView):
-    permission_classes = [IsAuthenticated]
-
     def get(self, request):
-        logout(request)
-        return Response("You are logged out")
+        if request.user.is_authenticated:
+            logout(request)
+            return Response("You are logged out")
+        else:
+            return Response("You are already logged out!")
 
 
 # For user creation view

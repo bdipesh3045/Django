@@ -111,15 +111,15 @@ class UserSerializer1(serializers.ModelSerializer):
 #         fields = ["date", "blog_title", "blog_content", "staff_member"]
 
 
-class UserBlog(serializers.ModelSerializer):
+class User_detail(serializers.ModelSerializer):
     class Meta:
         model = Users
         exclude = [
-            "email",
-            "is_staff",
-            "is_active",
+            # "email",
+            # "is_staff",
+            # "is_active",
             "is_superuser",
-            "is_otp_verified",
+            # "is_otp_verified",
             "groups",
             "user_permissions",
             "password",
