@@ -68,7 +68,7 @@ from django.contrib.auth import get_user_model
 
 class Blogs(models.Model):
     date = models.DateField(auto_now=True)
-    blog_title = models.CharField(max_length=20, primary_key=True)
+    blog_title = models.CharField(max_length=20)
     blog_content = models.CharField(max_length=10000)
     staff_member = models.ForeignKey(
         get_user_model(), related_name="Blogs", on_delete=models.CASCADE

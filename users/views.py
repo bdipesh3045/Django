@@ -87,41 +87,87 @@ class BlogCrud(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-    # def get_object(self, request, pk):
+    # def put(self, request, blog_title=None):
     #     try:
     #         blog = Blogs.objects.get(
-    #             staff_member__email=request.user.email,
-    #             blog_title=pk,
+    #             staff_member__email=request.user.email, blog_title=blog_title
     #         )
-    #         SerializedData = UserBlog(blog)
-    #         return Response(SerializedData.data, status=status.HTTP_200_OK)
+    #         serializer = BlogSerializer(blog, data=request.data)
+
+    #         if serializer.is_valid():
+    #             serializer.validated_data["blog_title"] = blog_title
+    #             serializer.save()
+    #             return Response(
+    #                 {"Details": "Blog Data Updated", "Data": serializer.data},
+    #                 status=status.HTTP_201_CREATED,
+    #             )
+
     #     except Blogs.DoesNotExist:
     #         return Response(
-    #             {"message": "Blog not found"}, status=status.HTTP_404_NOT_FOUND
+    #             {"Details": "Resource does not exist"},
+    #             status=status.HTTP_404_NOT_FOUND,
     #         )
 
-    # def delete(self, request, blog_title=None):
+    # def patch(self, request, blog_title=None):
     #     try:
     #         blog = Blogs.objects.get(
-    #             staff_member__email=request.user.email,
-    #             blog_title=blog_title,
+    #             staff_member__email=request.user.email, blog_title=blog_title
     #         )
+    #         serializer = BlogSerializer(blog, data=request.data, partial=True)
+
+    #         if serializer.is_valid():
+    #             serializer.save()
+    #             return Response(
+    #                 {"Details": "Blog Data Updated", "Data": serializer.data},
+    #                 status=status.HTTP_201_CREATED,
+    #             )
+
     #     except Blogs.DoesNotExist:
     #         return Response(
-    #             {"Details": "Resource does not exist"}, status=status.HTTP_404_NOT_FOUND
+    #             {"Details": "Resource does not exist"},
+    #             status=status.HTTP_404_NOT_FOUND,
     #         )
 
-    #     blog.delete()
-    #     return Response({"Details": "Blog Deleted"}, status=status.HTTP_204_NO_CONTENT)
-    # blogs = Blogs.objects.filter(staff_member__email=request.user.email)
-    # if blogs is None:
-    #     return Response(
-    #         {"Details": "Resource doesnot exist"}, status=status.HTTP_404_NOT_FOUND
-    #     )
-    # blog = blogs.get(blog_title=request.data)
-    # if blog is None:
-    #     return Response(
-    #         {"Details": "Resource doesnot exist"}, status=status.HTTP_404_NOT_FOUND
-    #     )
-    # blog.delete()
-    # return Response({"Details": "Blog Deleted"}, status=status.HTTP_204_NO_CONTENT)
+    def put(self, request, blog_title=None):
+        try:
+            blog = Blogs.objects.get(
+                staff_member__email=request.user.email, blog_title=blog_title
+            )
+            request.data["staff_member"] = request.user
+            serializer = BlogSerializer(blog, data=request.data)
+
+            if serializer.is_valid():
+                serializer.save()
+                return Response(
+                    {"Details": "Blog Data Updated", "Data": serializer.data},
+                    status=status.HTTP_200_OK,
+                )
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except Blogs.DoesNotExist:
+            return Response(
+                {"Details": "Resource does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+    def patch(self, request, blog_title=None):
+        try:
+            blog = Blogs.objects.get(
+                staff_member__email=request.user.email, blog_title=blog_title
+            )
+            request.data["staff_member"] = request.user
+            serializer = BlogSerializer(blog, data=request.data, partial=True)
+
+            if serializer.is_valid():
+                serializer.save()
+                return Response(
+                    {"Details": "Blog Data Updated", "Data": serializer.data},
+                    status=status.HTTP_200_OK,
+                )
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except Blogs.DoesNotExist:
+            return Response(
+                {"Details": "Resource does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
