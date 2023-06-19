@@ -50,7 +50,9 @@ class BlogCrud(APIView):
         return paginator.get_paginated_response(SerializedData.data)
 
     def post(self, request):
+        request.data["staff_member"] = request.user
         serializer = BlogSerializer(data=request.data)
+
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
