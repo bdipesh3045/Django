@@ -46,6 +46,7 @@ class UsersManager(BaseUserManager):
 class Users(AbstractBaseUser, PermissionsMixin):
     name = models.CharField(max_length=20)
     otp = models.IntegerField(null=True, blank=True)
+    pw_otp = models.IntegerField(null=True, blank=True)
     username = models.CharField(max_length=20, unique=True, default=None)
     email = models.EmailField(primary_key=True)
     profile_picture = models.ImageField(null=True, upload_to="photos", blank=True)

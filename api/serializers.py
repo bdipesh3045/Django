@@ -184,3 +184,11 @@ class BlogSerialize_wa(serializers.ModelSerializer):
     #     # latest_blog = Blogs.objects.filter(staff_member_id=user.email)
     #     user = UserBlog(user_data)
     #     return user.data
+
+
+class PwChange(serializers.Serializer):
+    old = serializers.CharField()
+    new = serializers.CharField()
+
+    class Meta:
+        fields = ["old", "new"]

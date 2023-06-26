@@ -108,6 +108,8 @@ class sendotpagain(APIView):
 
 # Logout view
 class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         if request.user.is_authenticated:
             logout(request)
@@ -257,3 +259,32 @@ class BlogView(APIView):
         paginated_blogs = paginator.paginate_queryset(blogs_query, request)
         blog_serializer = BlogSerialize_wa(paginated_blogs, many=True)
         return paginator.get_paginated_response(blog_serializer.data)
+
+
+from .serializers import PwChange
+
+
+class ChangePassword(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        return Response(
+            {"details": "To change your password provide your new and old password"}
+        )
+
+    def post(self, request):
+        user = Users.objects.get(email=request.user.email)
+        serializer = PwChange(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        old_pw = serializer.validated_data["old"]
+        new_pw = serializer.validated_data["new"]
+
+        password_matches = user.check_password(old_pw)
+        if password_matches == False:
+            return Response({"detail": "Invalid Credentials"}, status=400)
+        user.set_password(new_pw)
+        user.save()
+        return Response(
+            {"details": "Your password has been changed"},
+            status=status.HTTP_202_ACCEPTED,
+        )
