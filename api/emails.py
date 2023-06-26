@@ -14,3 +14,15 @@ def send_otp(email):
     user_obj = Users.objects.get(email=email)
     user_obj.otp = otp
     user_obj.save()
+
+
+def send_pwotp(email):
+    otp = randint(0000, 9999)
+
+    subject = "Use this Otp code to reset your password:"
+    message = f"Your otp is {otp}"
+    email_from = settings.EMAIL_HOST
+    send_mail(subject, message, email_from, [email])
+    user_obj = Users.objects.get(email=email)
+    user_obj.pw_otp = otp
+    user_obj.save()

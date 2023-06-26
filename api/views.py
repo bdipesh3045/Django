@@ -10,7 +10,7 @@ from .serializers import (
 )
 from rest_framework.response import Response
 from rest_framework import status
-from .emails import send_otp
+from .emails import send_otp, send_pwotp
 from rest_framework.views import APIView
 from rest_framework.pagination import PageNumberPagination
 from .models import Blogs
@@ -111,11 +111,7 @@ class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        if request.user.is_authenticated:
-            logout(request)
-            return Response("You are logged out")
-        else:
-            return Response("You are already logged out!")
+        return Response("You are already logged out!")
 
 
 # For user creation view
@@ -261,9 +257,10 @@ class BlogView(APIView):
         return paginator.get_paginated_response(blog_serializer.data)
 
 
-from .serializers import PwChange
+from .serializers import PwChange, ForgotPw
 
 
+# Change password
 class ChangePassword(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -288,3 +285,46 @@ class ChangePassword(APIView):
             {"details": "Your password has been changed"},
             status=status.HTTP_202_ACCEPTED,
         )
+
+
+# Forgot password
+# Forgot opt code
+
+
+# F
+class PwChangeOtp(APIView):
+    def get(self, request):
+        if request.user.is_authenticated:
+            return Response("Invalid command")
+        return Response({"details": "Provide Your email tp reset your password"})
+
+    def post(self, request):
+        if request.user.is_authenticated:
+            return Response("Invalid command")
+        print(request.data["email"])
+        email = request.data["email"]
+        if Users.objects.get(email=email) is None:
+            return Response({"Detail": "User doesnot exist"})
+
+        send_pwotp(email)
+        return Response({"Detail": "Otp has been sent"})
+
+
+class Forgot(APIView):
+    def get(self, request):
+        return Response(
+            {"Detail": "Provide your email otp and new password to reset your password"}
+        )
+
+    def post(self, request):
+        seriallizer = ForgotPw(data=request.data)
+        seriallizer.is_valid(raise_exception=True)
+
+        user = Users.objects.get(email=seriallizer.validated_data["email"])
+        if user is None:
+            return Response({"Detail": "User Does not exist"})
+        if str(seriallizer.validated_data["otp"]) == str(user.pw_otp):
+            user.set_password(seriallizer.validated_data["password"])
+            user.save()
+            return Response({"Detail": "You have recovered your password"})
+        return Response({"Detail": "Invalid OTP"})

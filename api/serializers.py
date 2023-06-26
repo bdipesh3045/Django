@@ -192,3 +192,12 @@ class PwChange(serializers.Serializer):
 
     class Meta:
         fields = ["old", "new"]
+
+
+class ForgotPw(serializers.Serializer):
+    password = serializers.CharField()
+    email = serializers.CharField()
+    otp = serializers.CharField()
+
+    class Meta:
+        fields = ["password", "email", "otp"]

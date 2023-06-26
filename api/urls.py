@@ -17,6 +17,8 @@ urlpatterns = [
     path("blogs", views.BlogView.as_view(), name="blogs"),
     path("test1", views.TestViewset1.as_view(), name="blogs1"),
     path("change", views.ChangePassword.as_view(), name="PasswordChange"),
+    path("reset", views.PwChangeOtp.as_view(), name="PwChangeOtp"),
+    path("forgot", views.Forgot.as_view(), name="Forgot"),
     # path("test", views.UserCreateView1.as_view(), name="create_user1"),
     # path("test", views.test.as_view(), name="user-create"),
 ]
